@@ -1,0 +1,8 @@
+type Task
+  @model
+  @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  text: String!
+  done: Boolean!
+}
+

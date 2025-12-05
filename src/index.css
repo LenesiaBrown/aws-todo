@@ -3,5 +3,136 @@
 @tailwind utilities;
 
 
+/* Amplify Auth UI customizations */
+
+
+body {
+  background-color: #020617;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body [data-amplify-authenticator] {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #020617;
+
+  /* Dark theme + purple brand */
+  --amplify-colors-background-primary: #020617;
+  --amplify-colors-background-secondary: #020617;
+  --amplify-colors-background-tertiary: #020617;
+
+  --amplify-colors-font-primary: #e5e7eb;   /* main text */
+  --amplify-colors-font-secondary: #9ca3af; /* subtler text */
+
+  --amplify-colors-brand-primary-10: #6366f1;
+  --amplify-colors-brand-primary-80: #6366f1;
+  --amplify-colors-brand-primary-90: #818cf8;
+}
+
+/* Outer auth card */
+body [data-amplify-authenticator] [data-amplify-container] {
+  max-width: 440px;
+  width: 100%;
+  border-radius: 1.25rem;
+  background-color: #0f172a;
+  border: 1px solid #0f172a;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.9);
+  padding: 1.75rem 2rem 2.25rem;
+  color: #e5e7eb;
+}
+
+/* Inner area (where the tabs + form live) */
+body [data-amplify-authenticator] [data-amplify-router],
+body [data-amplify-authenticator] form[data-amplify-form] {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Tabs at the top (Sign In / Create Account) */
+body [data-amplify-authenticator] .amplify-tabs__item {
+  color: #6b7280; /* gray when inactive */
+  font-weight: 500;
+}
+
+body [data-amplify-authenticator] .amplify-tabs__item[aria-selected="true"] {
+  color: #e5e7eb;                 /* active tab text */
+  border-color: #6366f1 !important; /* underline color */
+}
+
+body [data-amplify-authenticator] label.amplify-label {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+body [data-amplify-authenticator] .amplify-input {
+  background-color: #020617;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+body [data-amplify-authenticator] .amplify-input::placeholder {
+  color: #6b7280;
+}
+
+/* Primary button (Sign in / Create account) */
+body [data-amplify-authenticator] button.amplify-button--primary {
+  background-color: #6366f1;  
+  border-color: #6366f1;
+  color: #f9fafb;           
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+body [data-amplify-authenticator] button.amplify-button--primary:hover {
+  background-color: #818cf8;
+  border-color: #818cf8;
+}
+
+
+/* Make the show/hide password icon visible */
+body [data-amplify-authenticator] .amplify-field-group__outer-end svg {
+  stroke: #e5e7eb !important; 
+  fill: #e5e7eb !important;
+}
+
+
+/* Confirmation step text: make it readable */
+body [data-amplify-authenticator] legend,
+body [data-amplify-authenticator] [data-amplify-router] p {
+  color: #9ca3af;           
+}
+
+
+/* Style for Secondary buttons */
+body [data-amplify-authenticator] 
+  .amplify-button.amplify-field-group__control[type="button"] {
+  width: 100%;
+  background-color: #1f2937 !important; 
+  color: #cbd5e1 !important; 
+  border: 1px solid #334155 !important; 
+  padding: 10px 0;
+  font-size: 0.875rem;
+  border-radius: 10px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body [data-amplify-authenticator] 
+  .amplify-button.amplify-field-group__control[type="button"]:hover {
+  background-color: #334155 !important; 
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+/* Confirmation screen heading */
+body [data-amplify-authenticator] .amplify-heading--4 {
+  color: #e2e8f0 !important; 
+  font-weight: 600;
+}
+
+
+
 
 

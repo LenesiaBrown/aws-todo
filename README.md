@@ -1,3 +1,39 @@
+## A simple and secure cloud-connected to-do list web application built with **React**, **AWS Amplify**, **Amazon Cognito**, and **DynamoDB**.
+
+This app was created to learn core full-stack cloud skills including:
+- User authentication (Sign-Up, Sign-In, Email Confirmation) with Cognito
+- Cloud-hosted backend using Amplify + GraphQL API
+- Persistent data storage in DynamoDB
+- Custom-styled authentication UI using regular CSS
+- To-do list UI styled with Tailwind CSS
+- Deployed frontend using Vercel
+
+
+## Tech Stack
+
+| Layer            | Technology                                      |
+|------------------|--------------------------------------------------|
+| Frontend         | React (Vite)                                   |
+| Styling          | Custom CSS (Auth UI), Tailwind CSS (To-do UI)  |
+| Auth             | AWS Amplify + Amazon Cognito                   |
+| API / Backend    | AWS Amplify GraphQL API                        |
+| Database         | Amazon DynamoDB                                |
+| Frontend Hosting | Vercel (S3 + CloudFront planned next)          |
+| Version Control  | Git + GitHub                                   |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

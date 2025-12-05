@@ -1,75 +1,137 @@
 import { useState, useEffect } from "react";
+import { generateClient } from "aws-amplify/api";
+import { listTasks } from "../graphql/queries";
+import {
+  createTask as createTaskMutation,
+  updateTask as updateTaskMutation,
+  deleteTask as deleteTaskMutation,
+} from "../graphql/mutations";
+
+const client = generateClient();
+
 
 function TodoApp() {
   const [taskText, setTaskText] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true); // new: to show while we load from AWS
 
-  const [tasks, setTasks] = useState(() => {
-      // This function runs only once, when the component first loads
-    const saved = localStorage.getItem("aws-todo-tasks");
-
-    if (!saved) return [];             // nothing saved yet; start with empty list
-
-    try {
-      return JSON.parse(saved);        // turn saved JSON text back into an array
-    } catch (err) {
-      console.error("Bad data in localStorage:", err);
-      return [];
-    }
-
-  });
 
 
   useEffect(() => {
-    // whenever "tasks" changes, save it to localStorage
-    localStorage.setItem("aws-todo-tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  async function fetchTasks() {
+    try {
+      const response = await client.graphql({
+        query: listTasks,
+      });
+
+      // This is where Amplify puts the list of tasks
+      const items = response.data.listTasks.items;
+
+      // Optional: sort newest first
+      items.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+
+      setTasks(items);
+    } catch (err) {
+      console.error("Error fetching tasks from AWS:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchTasks();
+}, []);
+
 
 
 
   // ADDING A TASK
 
-  function handleAddTask(e) {
-    e.preventDefault(); // stop the form from refreshing the page
+  async function handleAddTask(e) {
+  e.preventDefault(); // stop form from refreshing page
 
-    const trimmed = taskText.trim();
-    if (!trimmed) return; // if input is empty, do nothing
+  const trimmed = taskText.trim();
+  if (!trimmed) return;
 
-    const newTask = {
-      id: Date.now(),   // unique id based on current time
-      text: trimmed,    // what the user typed
-      done: false       // task starts as "not done"
-    };
+  try {
+    // Call AWS to create a new Task in the database
+    const response = await client.graphql({
+      query: createTaskMutation,
+      variables: {
+        input: {
+          text: trimmed,
+          done: false,
+        },
+      },
+    });
 
-    // put the new task at the start of the list
-    setTasks([newTask, ...tasks]);
+    // Amplify returns the created task here
+    const newTask = response.data.createTask;
 
-    // clear the input box
+    // Put the new task at the top of the list
+    setTasks((prev) => [newTask, ...prev]);
+
+    // Clear input
     setTaskText("");
+  } catch (err) {
+    console.error("Error creating task in AWS:", err);
   }
+}
+
 
 
   // TOGGLE A TASK (done / not done)
 
-  function toggleTask(id) {
-    // go through each task and if the id matches, change to "done"
-    setTasks(tasks.map(task =>
-      task.id === id
-        ? { ...task, done: !task.done }
-        : task
-    ));
+  async function toggleTask(id) {
+  // Find the task we want to toggle
+  const task = tasks.find((t) => t.id === id);
+  if (!task) return;
+
+  try {
+    const response = await client.graphql({
+      query: updateTaskMutation,
+      variables: {
+        input: {
+          id: task.id,
+          done: !task.done,
+        },
+      },
+    });
+
+    const updatedTask = response.data.updateTask;
+
+    // Update it in local state
+    setTasks((prev) =>
+      prev.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
+  } catch (err) {
+    console.error("Error updating task in AWS:", err);
   }
+}
+
 
 
   // DELETE A TASK
  
-  function deleteTask(id) {
-    // keep every task EXCEPT the one with this id
-    setTasks(tasks.filter(task => task.id !== id));
+  async function deleteTask(id) {
+  try {
+    // Delete from AWS first
+    await client.graphql({
+      query: deleteTaskMutation,
+      variables: {
+        input: { id },
+      },
+    });
+
+    // Then remove it from local state
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  } catch (err) {
+    console.error("Error deleting task in AWS:", err);
   }
+}
 
 
-  // UI (what the user sees)
-  
+
+  // UI (what the user sees)  
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-50 px-4">
       <div className="w-full max-w-md bg-slate-950 rounded-2xl p-6 shadow-2xl border border-slate-800">
@@ -96,11 +158,19 @@ function TodoApp() {
           </button>
         </form>
 
-        {tasks.length === 0 ? (
+        {loading && (
+          <p className="text-xs text-slate-400">
+            Loading your tasks from the cloud…
+          </p>
+        )}
+
+        {!loading && tasks.length === 0 && (
           <p className="text-xs text-slate-500">
             No tasks yet. Add your first one above.
           </p>
-        ) : (
+        )}
+
+        {!loading && tasks.length > 0 && (
           <ul className="flex flex-col gap-2">
             {tasks.map((task) => (
               <li
@@ -131,6 +201,7 @@ function TodoApp() {
             ))}
           </ul>
         )}
+
       </div>
   </div>
 );
